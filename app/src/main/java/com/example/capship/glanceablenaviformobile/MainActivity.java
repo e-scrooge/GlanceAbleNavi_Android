@@ -77,13 +77,15 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
             routeOverlay.setStartTitle("現在地点");
 
             //目的地ピンの吹き出し設定
-            routeOverlay.setGoalTitle("広島県庁");
+            //routeOverlay.setGoalTitle("広島県庁");
+            routeOverlay.setGoalTitle("熊平製作所");
 
             //経由点ピンを非表示
-            routeOverlay.setRoutePinVisible(false);
+            routeOverlay.setRoutePinVisible(true);
 
             //出発地、目的地、移動手段を設定
-            routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34396560, 132459622), RouteOverlay.TRAFFIC_WALK);
+            //routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34396560, 132459622), RouteOverlay.TRAFFIC_WALK);
+            routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34365286, 132471866), RouteOverlay.TRAFFIC_WALK);
 
             //RouteOverlayListenerの設定
             routeOverlay.setRouteOverlayListener(this);
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
         naviController.setNaviControlListener(this);
 
         //案内処理を開始
-        //naviController.start();   //←このメソッド呼び出しでハングする…
+        naviController.start();
 
         return false;
     }
@@ -125,21 +127,95 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
 
     @Override
     public boolean onLocationChanged(NaviController naviController) {
+
+        double next_dist = 0;
+        int next_dire = 0;
+
         //目的地までの残りの距離
-        double rema_dist = naviController.getTotalDistance();
+        //double rema_dist = naviController.getTotalDistance();
 
         //目的地までの残りの時間
-        double rema_time = naviController.getTotalTime();
+        //double rema_time = naviController.getTotalTime();
 
         //出発地から目的地までの距離
-        double total_dist = naviController.getDistanceOfRemainder();
+        //double total_dist = naviController.getDistanceOfRemainder();
 
         //出発地から目的地までの時間
-        double total_time = naviController.getTimeOfRemainder();
+        //double total_time = naviController.getTimeOfRemainder();
+
+        //次の経由地点情報の取得
+        next_dist = naviController.getDistanceOfRemainder();
+        next_dire = naviController.getNextDirection();
 
         //現在位置
         Location location = naviController.getLocation();
+
+        Toast.makeText(this, String.format("%d,%s", next_dist, this.convertDirection(next_dire)), Toast.LENGTH_SHORT).show();
+
         return false;
+    }
+    private String convertDirection(int dirValue){
+
+        String direction = "?";
+
+        switch (dirValue){
+            case 0:
+                direction = "直進";
+                break;
+            case 1:
+                direction = "直進";
+                break;
+            case 2:
+                direction = "右折";
+                break;
+            case 3:
+                direction = "左折";
+                break;
+            case 4:
+                direction = "斜め前方右方向";
+                break;
+            case 5:
+                direction = "斜め前方左方向";
+                break;
+            case 6:
+                direction = "斜め後方右方向";
+                break;
+            case 7:
+                direction = "斜め後方左方向";
+                break;
+            case 9:
+                direction = "出発地";
+                break;
+            case 10:
+                direction = "目的地";
+                break;
+            case 12:
+                direction = "横断歩道を渡る";
+                break;
+            case 13:
+                direction = "道路を渡る";
+                break;
+            case 14:
+                direction = "歩道橋を渡る";
+                break;
+            case 15:
+                direction = "踏切を渡る";
+                break;
+            case 16:
+                direction = "連絡通路へ進む";
+                break;
+            case 17:
+                direction = "屋内通路へ進む";
+                break;
+            case 18:
+                direction = "敷地内通路へ進む";
+                break;
+            case 19:
+                direction = "歩道へ進む";
+                break;
+        }
+
+        return direction;
     }
 
     @Override
