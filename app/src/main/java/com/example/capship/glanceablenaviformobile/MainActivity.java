@@ -11,7 +11,7 @@ import jp.co.yahoo.android.maps.*;
 import jp.co.yahoo.android.maps.routing.RouteOverlay;
 import jp.co.yahoo.android.maps.navi.NaviController;
 
-public class MainActivity extends AppCompatActivity implements RouteOverlay.RouteOverlayListener, NaviController.NaviControllerListener {
+public class MainActivity extends AppCompatActivity implements RouteOverlay.RouteOverlayListener, CustomNaviController.NaviControllerListener {
 
     private MapView mMapView = null;//MapViewメンバー
     private MyLocationOverlay _overlay;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
     @Override
     public boolean finishRouteSearch(RouteOverlay routeOverlay) {
         //NaviControllerを作成しRouteOverlayインスタンスを設定
-        NaviController naviController = new NaviController(this,routeOverlay);
+        CustomNaviController naviController = new CustomNaviController(this,routeOverlay);
 
         //MapViewインスタンスを設定
         naviController.setMapView(mMapView);
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
     }
 
     @Override
-    public boolean onLocationChanged(NaviController naviController) {
+    public boolean onLocationChanged(CustomNaviController naviController) {
 
         double next_dist = 0;
         int next_dire = 0;
@@ -219,22 +219,22 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
     }
 
     @Override
-    public boolean onLocationTimeOver(NaviController naviController) {
+    public boolean onLocationTimeOver(CustomNaviController naviController) {
         return false;
     }
 
     @Override
-    public boolean onLocationAccuracyBad(NaviController naviController) {
+    public boolean onLocationAccuracyBad(CustomNaviController naviController) {
         return false;
     }
 
     @Override
-    public boolean onRouteOut(NaviController naviController) {
+    public boolean onRouteOut(CustomNaviController naviController) {
         return false;
     }
 
     @Override
-    public boolean onGoal(NaviController naviController) {
+    public boolean onGoal(CustomNaviController naviController) {
         //案内処理を継続しない場合は停止させる
         naviController.stop();
         return false;
