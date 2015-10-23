@@ -240,6 +240,35 @@ public class CustomNaviController implements LocationControl.LocationControlList
         }
     }
 
+    public double getDistanceToNextDirectionOfRemainder() {
+
+        double wkdist = 0;
+
+        if(this.m_routeControl == null) {
+            return 0.0D;
+        } else {
+            RLine line = this.m_routeControl.getNowRLine();
+            int dist = (int)line.distance;
+
+            for(int i = line.lno + 1; i < this.m_routeControl.count(); ++i) {
+                RLine next_line = this.m_routeControl.getRLine(i);
+                if(next_line.direction != null) {
+                    int wkflag = (int)Long.parseLong(next_line.direction);
+                    if(wkflag != 0 && wkflag != 1 && wkflag != 11) {
+                        GPoint gp = new GPoint(this.m_nowLocation.getLongitude(), this.m_nowLocation.getLatitude());
+                        wkdist = this.m_routeControl.getMDistanceNearPointToPoint(gp, next_line.getBeginPoint());
+                        //wkdist += this.m_routeControl.getMTotalDistanceByLNo(next_line.lno + 1);
+                        break;
+                    }
+
+                    //dist += (int)next_line.distance;
+                }
+            }
+
+            return (double)wkdist;
+        }
+    }
+
     public void onYLocationChanged(LocationControl location) {
         if(this.m_routeControl != null) {
             this.m_nowLocation = location.getLocation();

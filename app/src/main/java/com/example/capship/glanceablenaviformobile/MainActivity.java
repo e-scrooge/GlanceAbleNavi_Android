@@ -11,6 +11,8 @@ import jp.co.yahoo.android.maps.*;
 import jp.co.yahoo.android.maps.routing.RouteOverlay;
 import jp.co.yahoo.android.maps.navi.NaviController;
 
+import static java.lang.String.format;
+
 public class MainActivity extends AppCompatActivity implements RouteOverlay.RouteOverlayListener, CustomNaviController.NaviControllerListener {
 
     private MapView mMapView = null;//MapViewメンバー
@@ -144,13 +146,14 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
         //double total_time = naviController.getTimeOfRemainder();
 
         //次の経由地点情報の取得
-        next_dist = naviController.getDistanceOfRemainder();
+        //next_dist = naviController.getDistanceOfRemainder();
+        next_dist = naviController.getDistanceToNextDirectionOfRemainder();
         next_dire = naviController.getNextDirection();
 
         //現在位置
         Location location = naviController.getLocation();
 
-        Toast.makeText(this, String.format("%d,%s", next_dist, this.convertDirection(next_dire)), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, format("%s,%s", next_dist, convertDirection(next_dire)), Toast.LENGTH_SHORT).show();
 
         return false;
     }
