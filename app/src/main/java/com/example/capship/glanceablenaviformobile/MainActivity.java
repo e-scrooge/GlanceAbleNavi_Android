@@ -5,19 +5,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import jp.co.yahoo.android.maps.*;
 import jp.co.yahoo.android.maps.routing.RouteOverlay;
-import jp.co.yahoo.android.maps.navi.NaviController;
+//import jp.co.yahoo.android.maps;
+//import jp.co.yahoo.android.maps.navi.NaviController;
 
 import static java.lang.String.format;
+//import static jp.co.yahoo.android.maps.MapView.*;
 
-public class MainActivity extends AppCompatActivity implements RouteOverlay.RouteOverlayListener, CustomNaviController.NaviControllerListener {
+public class MainActivity extends AppCompatActivity implements MapView.MapTouchListener, RouteOverlay.RouteOverlayListener, CustomNaviController.NaviControllerListener {
 
     private MapView mMapView = null;//MapViewメンバー
     private MyLocationOverlay _overlay;
     private String AppId = "";
+    private GeoPoint pointGoal = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
         AppId = "dj0zaiZpPTJUQTFGczJSSnRBViZzPWNvbnN1bWVyc2VjcmV0Jng9NDA-";
 
         mMapView = new MapView(this, AppId);
+
+        mMapView.setLongPress(true);
+        mMapView.setMapTouchListener(this);
 
         //MyLocationOverlayインスタンス作成
         _overlay = new SubMyLocationOverlay(getApplicationContext(), mMapView, this);
@@ -76,18 +83,23 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
             RouteOverlay routeOverlay = new RouteOverlay(this, AppId);
 
             //出発地ピンの吹き出し設定
-            routeOverlay.setStartTitle("現在地点");
+            routeOverlay.setStartTitle("現在地");
 
             //目的地ピンの吹き出し設定
             //routeOverlay.setGoalTitle("広島県庁");
-            routeOverlay.setGoalTitle("熊平製作所");
+            routeOverlay.setGoalTitle("目的地");
 
             //経由点ピンを非表示
             routeOverlay.setRoutePinVisible(true);
 
             //出発地、目的地、移動手段を設定
             //routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34396560, 132459622), RouteOverlay.TRAFFIC_WALK);
-            routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34365286, 132471866), RouteOverlay.TRAFFIC_WALK);
+            if(this.pointGoal != null) {
+                routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(pointGoal.getLatitudeE6(), pointGoal.getLongitudeE6()), RouteOverlay.TRAFFIC_WALK);
+            }else{
+                routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34365286, 132471866), RouteOverlay.TRAFFIC_WALK);
+            }
+            //routeOverlay.setRoutePos(_overlay.getMyLocation(), new GeoPoint(34365286, 132471866), RouteOverlay.TRAFFIC_WALK);
 
             //RouteOverlayListenerの設定
             routeOverlay.setRouteOverlayListener(this);
@@ -240,6 +252,29 @@ public class MainActivity extends AppCompatActivity implements RouteOverlay.Rout
     public boolean onGoal(CustomNaviController naviController) {
         //案内処理を継続しない場合は停止させる
         naviController.stop();
+        return false;
+    }
+
+    @Override
+    public boolean onTouch(MapView mapView, MotionEvent motionEvent) {
+        //Toast.makeText(this, "Touch", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+    @Override
+    public boolean onLongPress(MapView mapView, Object o, PinOverlay pinOverlay, GeoPoint geoPoint) {
+        Toast.makeText(this, "目的地設定", Toast.LENGTH_SHORT).show();
+        this.pointGoal = geoPoint;
+        return false;
+    }
+
+    @Override
+    public boolean onPinchIn(MapView mapView) {
+        return false;
+    }
+
+    @Override
+    public boolean onPinchOut(MapView mapView) {
         return false;
     }
 }
