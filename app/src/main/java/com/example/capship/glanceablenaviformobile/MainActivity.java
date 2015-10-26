@@ -8,11 +8,15 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import java.util.Iterator;
+
 import jp.co.yahoo.android.maps.*;
 import jp.co.yahoo.android.maps.routing.RouteOverlay;
+import jp.co.yahoo.android.maps.indoormap.IndoormapOverlay;
 //import jp.co.yahoo.android.maps;
 //import jp.co.yahoo.android.maps.navi.NaviController;
 
+import static java.lang.StrictMath.abs;
 import static java.lang.String.format;
 //import static jp.co.yahoo.android.maps.MapView.*;
 
@@ -22,6 +26,9 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
     private MyLocationOverlay _overlay;
     private String AppId = "";
     private GeoPoint pointGoal = null;
+    private double prevDistance = 0;
+    private CustomNaviController naviController = null;
+    private RouteOverlay routeOverlay = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
 
         //現在位置取得開始
         _overlay.enableMyLocation();
+        //_overlay.getMyLocation();
 
         //MapViewにMyLocationOverlayを追加。
         mMapView.getOverlays().add(_overlay);
@@ -74,13 +82,32 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == R.id.navi_end) {
+
+            Toast.makeText(this, "経路検索を中断します", Toast.LENGTH_SHORT).show();
+
+            if (mMapView != null) {
+                this.mMapView.removeOverlayAll();
+                //this.mMapView.removeIndoormapOverlay(null);
+                this.routeOverlay = null;
+
+                this.mMapView.getOverlays().add(this._overlay);
+                this.mMapView.invalidate();
+            }
+
+            if (this.naviController != null) {
+                this.naviController.stop();
+                this.naviController = null;
+            }
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
 
-            Toast.makeText(this, "経路検索", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "経路検索開始を開始します", Toast.LENGTH_SHORT).show();
 
             //RouteOverlay作成
-            RouteOverlay routeOverlay = new RouteOverlay(this, AppId);
+            routeOverlay = new RouteOverlay(this, AppId);
 
             //出発地ピンの吹き出し設定
             routeOverlay.setStartTitle("現在地");
@@ -120,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
     @Override
     public boolean finishRouteSearch(RouteOverlay routeOverlay) {
         //NaviControllerを作成しRouteOverlayインスタンスを設定
-        CustomNaviController naviController = new CustomNaviController(this,routeOverlay);
+        naviController = new CustomNaviController(this,routeOverlay);
 
         //MapViewインスタンスを設定
         naviController.setMapView(mMapView);
@@ -165,10 +192,14 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
         //現在位置
         Location location = naviController.getLocation();
 
-        Toast.makeText(this, format("%s,%s", next_dist, convertDirection(next_dire)), Toast.LENGTH_SHORT).show();
+        if(abs(next_dist - this.prevDistance) >= 5){
+            Toast.makeText(this, format("%.2f m先 %s", next_dist, convertDirection(next_dire)), Toast.LENGTH_SHORT).show();
+            this.prevDistance = next_dist;
+        }
 
         return false;
     }
+
     private String convertDirection(int dirValue){
 
         String direction = "?";
@@ -252,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
     public boolean onGoal(CustomNaviController naviController) {
         //案内処理を継続しない場合は停止させる
         naviController.stop();
+        naviController = null;
         return false;
     }
 
