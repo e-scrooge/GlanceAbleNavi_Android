@@ -23,7 +23,7 @@ import static java.lang.String.format;
 public class MainActivity extends AppCompatActivity implements MapView.MapTouchListener, RouteOverlay.RouteOverlayListener, CustomNaviController.NaviControllerListener {
 
     private MapView mMapView = null;//MapViewメンバー
-    private MyLocationOverlay _overlay;
+    private SubMyLocationOverlay _overlay;
     private String AppId = "";
     private GeoPoint pointGoal = null;
     private double prevDistance = 0;
@@ -50,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
 
         //MapViewにMyLocationOverlayを追加。
         mMapView.getOverlays().add(_overlay);
+
+        //広島県庁を初期表示位置へ
+        GeoPoint p = new GeoPoint(34396560, 132459622);
+        mMapView.getMapController().animateTo(p);
+
         mMapView.invalidate();
 
         setContentView(mMapView);
@@ -99,12 +104,20 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
                 this.naviController.stop();
                 this.naviController = null;
             }
+
+            if (this._overlay != null) {
+                this._overlay.SetNaviFlag(false);
+            }
         }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
 
             Toast.makeText(this, "経路検索開始を開始します", Toast.LENGTH_SHORT).show();
+
+            if (this._overlay != null) {
+                this._overlay.SetNaviFlag(true);
+            }
 
             //RouteOverlay作成
             routeOverlay = new RouteOverlay(this, AppId);

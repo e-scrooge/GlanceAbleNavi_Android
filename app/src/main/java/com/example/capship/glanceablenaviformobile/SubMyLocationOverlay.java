@@ -12,8 +12,12 @@ public class SubMyLocationOverlay extends MyLocationOverlay {
     MapView _mapView = null;
     Activity _activity = null;
 
+    private boolean mNaviFlag = false;
+
     public SubMyLocationOverlay(Context context, MapView mapView, Activity activity) {
         super(context, mapView);
+
+        mNaviFlag = false;
 
         _mapView = mapView;
         _activity = activity;
@@ -24,11 +28,17 @@ public class SubMyLocationOverlay extends MyLocationOverlay {
     public void onLocationChanged(android.location.Location location) {
         super.onLocationChanged(location);
 
-        if (_mapView.getMapController() != null) {
-            //位置が更新されると地図の位置も変える。
-            GeoPoint p = new GeoPoint((int) (location.getLatitude() * 1E6),(int) (location.getLongitude() * 1E6));
-            _mapView.getMapController().animateTo(p);
-            _mapView.invalidate();
+        if (mNaviFlag == true) {
+            if (_mapView.getMapController() != null) {
+                //位置が更新されると地図の位置も変える。
+                GeoPoint p = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
+                _mapView.getMapController().animateTo(p);
+                _mapView.invalidate();
+            }
         }
+    }
+
+    public void SetNaviFlag (boolean flag) {
+        mNaviFlag = flag;
     }
 }
