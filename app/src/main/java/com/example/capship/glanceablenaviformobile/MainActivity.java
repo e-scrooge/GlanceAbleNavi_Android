@@ -1,5 +1,6 @@
 package com.example.capship.glanceablenaviformobile;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -86,6 +87,23 @@ public class MainActivity extends AppCompatActivity implements MapView.MapTouchL
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        if (id == R.id.get_my_positon) {
+
+            ProgressDialog mProgDialog = null;//プログレスダイアログ
+
+            mProgDialog = new ProgressDialog(this);
+            mProgDialog.setMessage("現在位置取得中");
+            mProgDialog.setCancelable(false);
+            mProgDialog.show();
+
+            GeoPoint myPoint = this._overlay.getMyLocation();
+            this.mMapView.getMapController().animateTo(myPoint);
+            this.mMapView.invalidate();
+
+            mProgDialog.dismiss();
+            mProgDialog = null;
+        }
 
         if (id == R.id.navi_end) {
 

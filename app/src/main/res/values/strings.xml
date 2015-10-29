@@ -2,6 +2,7 @@
     <string name="app_name">GlanceableNaviForMobile</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="get_my_position">現在地取得</string>
     <string name="action_settings">開始</string>
     <string name="navi_end">終了</string>
 </resources>
